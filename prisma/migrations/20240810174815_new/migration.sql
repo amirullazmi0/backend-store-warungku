@@ -1,10 +1,10 @@
 -- CreateTable
 CREATE TABLE "user" (
-    "id" VARCHAR(255) NOT NULL,
+    "id" UUID NOT NULL,
     "email" VARCHAR(255) NOT NULL,
-    "fullName" VARCHAR(255) NOT NULL,
+    "name" VARCHAR(255) NOT NULL,
     "bio" TEXT,
-    "addressId" VARCHAR(255),
+    "addressId" UUID,
     "logo" VARCHAR,
     "password" VARCHAR(255) NOT NULL,
     "accessToken" VARCHAR(255),
@@ -18,7 +18,7 @@ CREATE TABLE "user" (
 
 -- CreateTable
 CREATE TABLE "address" (
-    "id" VARCHAR(255) NOT NULL,
+    "id" UUID NOT NULL,
     "active" BOOLEAN,
     "jalan" VARCHAR(255),
     "rt" VARCHAR(255),
@@ -36,8 +36,8 @@ CREATE TABLE "address" (
 
 -- CreateTable
 CREATE TABLE "userAddress" (
-    "addressId" VARCHAR(255) NOT NULL,
-    "userId" VARCHAR(255) NOT NULL,
+    "addressId" UUID NOT NULL,
+    "userId" UUID NOT NULL,
 
     CONSTRAINT "userAddress_pkey" PRIMARY KEY ("addressId","userId")
 );
@@ -51,7 +51,7 @@ CREATE TABLE "itemstore" (
     "desc" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "userId" VARCHAR(255) NOT NULL,
+    "userId" UUID NOT NULL,
 
     CONSTRAINT "itemstore_pkey" PRIMARY KEY ("id")
 );
@@ -63,7 +63,7 @@ CREATE TABLE "transaction" (
     "item" JSONB[],
     "invoice" JSONB,
     "total" INTEGER NOT NULL,
-    "userId" VARCHAR(255) NOT NULL,
+    "userId" UUID NOT NULL,
 
     CONSTRAINT "transaction_pkey" PRIMARY KEY ("id")
 );
@@ -76,6 +76,9 @@ CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "address_id_key" ON "address"("id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "itemstore_id_key" ON "itemstore"("id");
 
 -- AddForeignKey
 ALTER TABLE "user" ADD CONSTRAINT "user_addressId_fkey" FOREIGN KEY ("addressId") REFERENCES "address"("id") ON DELETE SET NULL ON UPDATE CASCADE;
