@@ -59,15 +59,23 @@ model userAddress {
 }
 
 model itemstore {
-  id        String   @id @unique @db.Uuid
-  name      String   @db.VarChar(255)
-  total     Int      @db.Integer
-  price     Int      @db.Integer
-  desc      String?  @db.Text
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user      user     @relation(fields: [userId], references: [id])
-  userId    String   @db.Uuid
+  id              String            @id @unique @db.Uuid
+  name            String            @db.VarChar(255)
+  total           Int               @db.Integer
+  price           Int               @db.Integer
+  desc            String?           @db.Text
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  user            user              @relation(fields: [userId], references: [id])
+  userId          String            @db.Uuid
+  itemStoreImages itemStoreImages[]
+}
+
+model itemStoreImages {
+  id          String    @id @unique @db.Uuid
+  path        String    @db.VarChar(255)
+  itemStore   itemstore @relation(fields: [itemstoreId], references: [id], onDelete: Cascade)
+  itemstoreId String    @db.Uuid
 }
 
 model transaction {

@@ -57,6 +57,15 @@ CREATE TABLE "itemstore" (
 );
 
 -- CreateTable
+CREATE TABLE "itemStoreImages" (
+    "id" UUID NOT NULL,
+    "path" VARCHAR(255) NOT NULL,
+    "itemstoreId" UUID NOT NULL,
+
+    CONSTRAINT "itemStoreImages_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "transaction" (
     "id" UUID NOT NULL,
     "customer" UUID NOT NULL,
@@ -80,6 +89,9 @@ CREATE UNIQUE INDEX "address_id_key" ON "address"("id");
 -- CreateIndex
 CREATE UNIQUE INDEX "itemstore_id_key" ON "itemstore"("id");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "itemStoreImages_id_key" ON "itemStoreImages"("id");
+
 -- AddForeignKey
 ALTER TABLE "user" ADD CONSTRAINT "user_addressId_fkey" FOREIGN KEY ("addressId") REFERENCES "address"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
@@ -91,6 +103,9 @@ ALTER TABLE "userAddress" ADD CONSTRAINT "userAddress_userId_fkey" FOREIGN KEY (
 
 -- AddForeignKey
 ALTER TABLE "itemstore" ADD CONSTRAINT "itemstore_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "itemStoreImages" ADD CONSTRAINT "itemStoreImages_itemstoreId_fkey" FOREIGN KEY ("itemstoreId") REFERENCES "itemstore"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "transaction" ADD CONSTRAINT "transaction_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

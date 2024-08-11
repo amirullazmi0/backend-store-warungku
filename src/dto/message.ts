@@ -1,5 +1,7 @@
 export const getDataSuccess = 'get data successfully';
 export const getDataFailed = 'get data failed';
+export const createDataSuccess = 'create data successfully';
+export const createDataFailed = 'create data failed';
 export const updateDataSuccess = 'update data successfully';
 export const updateDataFailed = 'update data failed';
 export const updatePasswordSuccess = 'update password successfully';
@@ -19,4 +21,5 @@ export const createFileSuccess = 'create file successfully'
 export const createFileFailed = 'create file failed'
 export const fileMustImage = 'file must be image'
 export const passwordFalse = 'Password wrong'
+
 

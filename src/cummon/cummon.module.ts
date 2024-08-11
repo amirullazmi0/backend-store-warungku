@@ -10,6 +10,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TokenCleanupService } from 'src/auth/token-cleanup.service';
+import { AttachmentService } from 'src/attachment/attachment.service';
 
 @Global()
 @Module({
@@ -35,8 +36,8 @@ import { TokenCleanupService } from 'src/auth/token-cleanup.service';
         ScheduleModule.forRoot(),
         HttpModule,
     ],
-    providers: [PrismaService, TokenCleanupService],
-    exports: [PrismaService, TokenCleanupService],
+    providers: [PrismaService, TokenCleanupService, AttachmentService],
+    exports: [PrismaService, TokenCleanupService, AttachmentService],
 })
 export class CummonModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {

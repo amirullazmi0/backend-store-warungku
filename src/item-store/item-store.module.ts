@@ -6,4 +6,4 @@ import { ItemStoreController } from './item-store.controller';
   providers: [ItemStoreService],
   controllers: [ItemStoreController]
 })
-export class ItemStoreModule {}
+export class ItemStoreModule { }
