@@ -59,16 +59,34 @@ model userAddress {
 }
 
 model itemstore {
-  id              String            @id @unique @db.Uuid
-  name            String            @db.VarChar(255)
-  total           Int               @db.Integer
-  price           Int               @db.Integer
-  desc            String?           @db.Text
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  user            user              @relation(fields: [userId], references: [id])
-  userId          String            @db.Uuid
-  itemStoreImages itemStoreImages[]
+  id                  String                @id @unique @db.Uuid
+  name                String                @db.VarChar(255)
+  total               Int                   @db.Integer
+  price               Int                   @db.Integer
+  desc                String?               @db.Text
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  user                user                  @relation(fields: [userId], references: [id])
+  userId              String                @db.Uuid
+  itemStoreImages     itemStoreImages[]
+  categoriesItemStore categoriesItemStore[]
+}
+
+model category {
+  id                  String                @id @unique @db.Uuid
+  name                String                @db.VarChar(255)
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  categoriesItemStore categoriesItemStore[]
+}
+
+model categoriesItemStore {
+  categoryId  String    @db.Uuid
+  category    category  @relation(fields: [categoryId], references: [id])
+  itemStoreId String    @db.Uuid
+  itemStore   itemstore @relation(fields: [itemStoreId], references: [id])
+
+  @@id([categoryId, itemStoreId])
 }
 
 model itemStoreImages {

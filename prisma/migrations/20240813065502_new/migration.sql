@@ -57,6 +57,24 @@ CREATE TABLE "itemstore" (
 );
 
 -- CreateTable
+CREATE TABLE "category" (
+    "id" UUID NOT NULL,
+    "name" VARCHAR(255) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "category_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "categoriesItemStore" (
+    "categoryId" UUID NOT NULL,
+    "itemStoreId" UUID NOT NULL,
+
+    CONSTRAINT "categoriesItemStore_pkey" PRIMARY KEY ("categoryId","itemStoreId")
+);
+
+-- CreateTable
 CREATE TABLE "itemStoreImages" (
     "id" UUID NOT NULL,
     "path" VARCHAR(255) NOT NULL,
@@ -90,6 +108,9 @@ CREATE UNIQUE INDEX "address_id_key" ON "address"("id");
 CREATE UNIQUE INDEX "itemstore_id_key" ON "itemstore"("id");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "category_id_key" ON "category"("id");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "itemStoreImages_id_key" ON "itemStoreImages"("id");
 
 -- AddForeignKey
@@ -105,7 +126,13 @@ ALTER TABLE "userAddress" ADD CONSTRAINT "userAddress_userId_fkey" FOREIGN KEY (
 ALTER TABLE "itemstore" ADD CONSTRAINT "itemstore_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "itemStoreImages" ADD CONSTRAINT "itemStoreImages_itemstoreId_fkey" FOREIGN KEY ("itemstoreId") REFERENCES "itemstore"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "categoriesItemStore" ADD CONSTRAINT "categoriesItemStore_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "category"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "categoriesItemStore" ADD CONSTRAINT "categoriesItemStore_itemStoreId_fkey" FOREIGN KEY ("itemStoreId") REFERENCES "itemstore"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "itemStoreImages" ADD CONSTRAINT "itemStoreImages_itemstoreId_fkey" FOREIGN KEY ("itemstoreId") REFERENCES "itemstore"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "transaction" ADD CONSTRAINT "transaction_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
