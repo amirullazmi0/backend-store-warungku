@@ -28,7 +28,7 @@ model user {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   userAddress  userAddress[]
-  itemstore    itemstore[]
+  itemstore    itemStore[]
   transaction  transaction[]
 }
 
@@ -58,18 +58,19 @@ model userAddress {
   @@id([addressId, userId])
 }
 
-model itemstore {
-  id                  String                @id @unique @db.Uuid
-  name                String                @db.VarChar(255)
-  total               Int                   @db.Integer
-  price               Int                   @db.Integer
-  desc                String?               @db.Text
-  createdAt           DateTime              @default(now())
-  updatedAt           DateTime              @updatedAt
-  user                user                  @relation(fields: [userId], references: [id])
-  userId              String                @db.Uuid
-  itemStoreImages     itemStoreImages[]
-  categoriesItemStore categoriesItemStore[]
+model itemStore {
+  id                   String                 @id @unique @db.Uuid
+  name                 String                 @db.VarChar(255)
+  total                Int                    @db.Integer
+  price                Int                    @db.Integer
+  desc                 String?                @db.Text
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  user                 user                   @relation(fields: [userId], references: [id])
+  userId               String                 @db.Uuid
+  itemStoreImages      itemStoreImages[]
+  categoriesItemStore  categoriesItemStore[]
+  transactionItemStore transactionItemStore[]
 }
 
 model category {
@@ -84,7 +85,7 @@ model categoriesItemStore {
   categoryId  String    @db.Uuid
   category    category  @relation(fields: [categoryId], references: [id])
   itemStoreId String    @db.Uuid
-  itemStore   itemstore @relation(fields: [itemStoreId], references: [id])
+  itemStore   itemStore @relation(fields: [itemStoreId], references: [id])
 
   @@id([categoryId, itemStoreId])
 }
@@ -92,16 +93,30 @@ model categoriesItemStore {
 model itemStoreImages {
   id          String    @id @unique @db.Uuid
   path        String    @db.VarChar(255)
-  itemStore   itemstore @relation(fields: [itemstoreId], references: [id], onDelete: Cascade)
+  itemStore   itemStore @relation(fields: [itemstoreId], references: [id], onDelete: Cascade)
   itemstoreId String    @db.Uuid
 }
 
 model transaction {
-  id       String @id @db.Uuid
-  customer String @db.Uuid
-  item     Json[]
-  invoice  Json?
-  total    Int
-  user     user   @relation(fields: [userId], references: [id])
-  userId   String @db.Uuid
+  id                   String                 @id @db.Uuid
+  customer             String                 @db.Uuid
+  invoice              Json?
+  total                Int
+  user                 user                   @relation(fields: [userId], references: [id])
+  userId               String                 @db.Uuid
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  transactionItemStore transactionItemStore[]
+}
+
+model transactionItemStore {
+  transactionId String      @db.Uuid
+  itemStoreId   String      @db.Uuid
+  qty           Int
+  unitPrice     Int
+  totalPrice    Int
+  transaction   transaction @relation(fields: [transactionId], references: [id])
+  itemStore     itemStore   @relation(fields: [itemStoreId], references: [id])
+
+  @@id([transactionId, itemStoreId])
 }
