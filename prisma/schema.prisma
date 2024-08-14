@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,27 +8,27 @@ datasource db {
 }
 
 model user {
-  id           String        @id @unique @db.Uuid
+  id           String        @id @default(uuid()) @db.Uuid
   email        String        @unique @db.VarChar(255)
   name         String        @db.VarChar(255)
-  bio          String?       @db.Text()
-  address      address?      @relation(fields: [addressId], references: [id])
+  bio          String?
   addressId    String?       @db.Uuid
-  logo         String?       @db.VarChar()
+  logo         String?       @db.VarChar
   password     String        @db.VarChar(255)
   accessToken  String?       @db.VarChar(255)
   refreshToken String?       @db.VarChar(255)
-  lastActive   DateTime?     @db.Timestamp()
+  lastActive   DateTime?     @db.Timestamp(6)
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
-  userAddress  userAddress[]
   itemstore    itemStore[]
   transaction  transaction[]
+  address      address?      @relation(fields: [addressId], references: [id])
+  userAddress  userAddress[]
 }
 
 model address {
-  id          String        @id @unique @db.Uuid
-  active      Boolean?      @db.Boolean
+  id          String        @id @default(uuid()) @db.Uuid
+  active      Boolean?
   jalan       String?       @db.VarChar(255)
   rt          String?       @db.VarChar(255)
   rw          String?       @db.VarChar(255)
@@ -59,22 +53,22 @@ model userAddress {
 }
 
 model itemStore {
-  id                   String                 @id @unique @db.Uuid
+  id                   String                 @id @default(uuid()) @db.Uuid
   name                 String                 @db.VarChar(255)
-  total                Int                    @db.Integer
-  price                Int                    @db.Integer
-  desc                 String?                @db.Text
+  total                Int
+  price                Int
+  desc                 String?
   createdAt            DateTime               @default(now())
   updatedAt            DateTime               @updatedAt
-  user                 user                   @relation(fields: [userId], references: [id])
   userId               String                 @db.Uuid
-  itemStoreImages      itemStoreImages[]
   categoriesItemStore  categoriesItemStore[]
+  user                 user                   @relation(fields: [userId], references: [id])
+  itemStoreImages      itemStoreImages[]
   transactionItemStore transactionItemStore[]
 }
 
 model category {
-  id                  String                @id @unique @db.Uuid
+  id                  String                @id @default(uuid()) @db.Uuid
   name                String                @db.VarChar(255)
   createdAt           DateTime              @default(now())
   updatedAt           DateTime              @updatedAt
@@ -83,29 +77,29 @@ model category {
 
 model categoriesItemStore {
   categoryId  String    @db.Uuid
-  category    category  @relation(fields: [categoryId], references: [id])
   itemStoreId String    @db.Uuid
+  category    category  @relation(fields: [categoryId], references: [id])
   itemStore   itemStore @relation(fields: [itemStoreId], references: [id])
 
   @@id([categoryId, itemStoreId])
 }
 
 model itemStoreImages {
-  id          String    @id @unique @db.Uuid
+  id          String    @id @default(uuid()) @db.Uuid
   path        String    @db.VarChar(255)
-  itemStore   itemStore @relation(fields: [itemstoreId], references: [id], onDelete: Cascade)
   itemstoreId String    @db.Uuid
+  itemStore   itemStore @relation(fields: [itemstoreId], references: [id], onDelete: Cascade)
 }
 
 model transaction {
-  id                   String                 @id @db.Uuid
-  customer             String                 @db.Uuid
+  id                   String                 @id @default(uuid()) @db.Uuid
+  customerId           String                 @db.Uuid
   invoice              Json?
   total                Int
-  user                 user                   @relation(fields: [userId], references: [id])
   userId               String                 @db.Uuid
   createdAt            DateTime               @default(now())
   updatedAt            DateTime               @updatedAt
+  user                 user                   @relation(fields: [userId], references: [id])
   transactionItemStore transactionItemStore[]
 }
 
@@ -115,8 +109,13 @@ model transactionItemStore {
   qty           Int
   unitPrice     Int
   totalPrice    Int
-  transaction   transaction @relation(fields: [transactionId], references: [id])
   itemStore     itemStore   @relation(fields: [itemStoreId], references: [id])
+  transaction   transaction @relation(fields: [transactionId], references: [id])
 
   @@id([transactionId, itemStoreId])
+}
+
+enum rolesUser {
+  user
+  super
 }

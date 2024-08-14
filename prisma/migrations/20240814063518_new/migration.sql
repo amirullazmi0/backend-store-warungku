@@ -1,3 +1,6 @@
+-- CreateEnum
+CREATE TYPE "rolesUser" AS ENUM ('user', 'super');
+
 -- CreateTable
 CREATE TABLE "user" (
     "id" UUID NOT NULL,
@@ -9,7 +12,7 @@ CREATE TABLE "user" (
     "password" VARCHAR(255) NOT NULL,
     "accessToken" VARCHAR(255),
     "refreshToken" VARCHAR(255),
-    "lastActive" TIMESTAMP,
+    "lastActive" TIMESTAMP(6),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -43,7 +46,7 @@ CREATE TABLE "userAddress" (
 );
 
 -- CreateTable
-CREATE TABLE "itemstore" (
+CREATE TABLE "itemStore" (
     "id" UUID NOT NULL,
     "name" VARCHAR(255) NOT NULL,
     "total" INTEGER NOT NULL,
@@ -53,7 +56,7 @@ CREATE TABLE "itemstore" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "userId" UUID NOT NULL,
 
-    CONSTRAINT "itemstore_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "itemStore_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -86,32 +89,29 @@ CREATE TABLE "itemStoreImages" (
 -- CreateTable
 CREATE TABLE "transaction" (
     "id" UUID NOT NULL,
-    "customer" UUID NOT NULL,
-    "item" JSONB[],
+    "customerId" UUID NOT NULL,
     "invoice" JSONB,
     "total" INTEGER NOT NULL,
     "userId" UUID NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "transaction_pkey" PRIMARY KEY ("id")
 );
 
--- CreateIndex
-CREATE UNIQUE INDEX "user_id_key" ON "user"("id");
+-- CreateTable
+CREATE TABLE "transactionItemStore" (
+    "transactionId" UUID NOT NULL,
+    "itemStoreId" UUID NOT NULL,
+    "qty" INTEGER NOT NULL,
+    "unitPrice" INTEGER NOT NULL,
+    "totalPrice" INTEGER NOT NULL,
+
+    CONSTRAINT "transactionItemStore_pkey" PRIMARY KEY ("transactionId","itemStoreId")
+);
 
 -- CreateIndex
 CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
-
--- CreateIndex
-CREATE UNIQUE INDEX "address_id_key" ON "address"("id");
-
--- CreateIndex
-CREATE UNIQUE INDEX "itemstore_id_key" ON "itemstore"("id");
-
--- CreateIndex
-CREATE UNIQUE INDEX "category_id_key" ON "category"("id");
-
--- CreateIndex
-CREATE UNIQUE INDEX "itemStoreImages_id_key" ON "itemStoreImages"("id");
 
 -- AddForeignKey
 ALTER TABLE "user" ADD CONSTRAINT "user_addressId_fkey" FOREIGN KEY ("addressId") REFERENCES "address"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -123,16 +123,22 @@ ALTER TABLE "userAddress" ADD CONSTRAINT "userAddress_addressId_fkey" FOREIGN KE
 ALTER TABLE "userAddress" ADD CONSTRAINT "userAddress_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "itemstore" ADD CONSTRAINT "itemstore_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "itemStore" ADD CONSTRAINT "itemStore_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "categoriesItemStore" ADD CONSTRAINT "categoriesItemStore_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "category"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "categoriesItemStore" ADD CONSTRAINT "categoriesItemStore_itemStoreId_fkey" FOREIGN KEY ("itemStoreId") REFERENCES "itemstore"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "categoriesItemStore" ADD CONSTRAINT "categoriesItemStore_itemStoreId_fkey" FOREIGN KEY ("itemStoreId") REFERENCES "itemStore"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "itemStoreImages" ADD CONSTRAINT "itemStoreImages_itemstoreId_fkey" FOREIGN KEY ("itemstoreId") REFERENCES "itemstore"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "itemStoreImages" ADD CONSTRAINT "itemStoreImages_itemstoreId_fkey" FOREIGN KEY ("itemstoreId") REFERENCES "itemStore"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "transaction" ADD CONSTRAINT "transaction_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "transactionItemStore" ADD CONSTRAINT "transactionItemStore_itemStoreId_fkey" FOREIGN KEY ("itemStoreId") REFERENCES "itemStore"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "transactionItemStore" ADD CONSTRAINT "transactionItemStore_transactionId_fkey" FOREIGN KEY ("transactionId") REFERENCES "transaction"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

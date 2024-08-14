@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { itemstore, itemStoreImages, user } from '@prisma/client';
+import { itemStore, itemStoreImages, user } from '@prisma/client';
 import { log } from 'console';
 import { randomUUID } from 'crypto';
 import { Request } from 'express';
@@ -19,9 +19,9 @@ export class ItemStoreService {
 
     async getItemStore(user: user, itemStoreId?: string): Promise<WebResponse<any>> {
         try {
-            let item: itemstore | itemstore[]
+            let item: itemStore | itemStore[]
             if (itemStoreId) {
-                item = await this.prismaService.itemstore.findFirst({
+                item = await this.prismaService.itemStore.findFirst({
                     where: {
                         userId: user.id,
                         id: itemStoreId
@@ -35,7 +35,7 @@ export class ItemStoreService {
                     throw new NotFoundException(dataNotFound)
                 }
             } else {
-                item = await this.prismaService.itemstore.findMany({
+                item = await this.prismaService.itemStore.findMany({
                     where: { userId: user.id },
                     include: {
                         itemStoreImages: true
@@ -67,7 +67,7 @@ export class ItemStoreService {
                 desc: body.desc
             })
 
-            let saveItem = await this.prismaService.itemstore.create({
+            let saveItem = await this.prismaService.itemStore.create({
                 data: {
                     id: id,
                     name: validate.name,
@@ -93,7 +93,7 @@ export class ItemStoreService {
                 log(createFileSuccess)
             }
 
-            const itemStore = await this.prismaService.itemstore.findUnique({
+            const itemStore = await this.prismaService.itemStore.findUnique({
                 where: { id: saveItem.id },
                 include: {
                     itemStoreImages: true
@@ -115,7 +115,7 @@ export class ItemStoreService {
 
     async deleteItemStore(user: user, body: ItemStoreDeleteRequestDTO): Promise<WebResponse<any>> {
         try {
-            const itemStore = await this.prismaService.itemstore.findFirst({
+            const itemStore = await this.prismaService.itemStore.findFirst({
                 where: {
                     id: body.id,
                     userId: user.id
@@ -126,7 +126,7 @@ export class ItemStoreService {
                 throw new BadRequestException(dataNotFound)
             }
 
-            await this.prismaService.itemstore.delete({
+            await this.prismaService.itemStore.delete({
                 where: {
                     id: body.id
                 }

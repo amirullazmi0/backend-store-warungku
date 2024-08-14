@@ -1,18 +1,39 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { authLoginRequestSchema, authRegisterRequestSchema, LoginDTO, RegisterDTO } from 'src/dto/auth.dto';
-import { accountNotRegister, authLoginFailed, authLoginSuccess, emailIsUnique, emailPassworWrong, registerFailed, registerSuccess } from 'src/dto/message';
+import { accountNotRegister, authLoginFailed, authLoginSuccess, authorized, emailIsUnique, emailPassworWrong, registerFailed, registerSuccess, unAuthorized } from 'src/dto/message';
 import { WebResponse } from 'src/dto/promise';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from "bcrypt";
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
+import { Prisma, user } from '@prisma/client';
 @Injectable()
 export class AuthService {
     constructor(
         private prismaService: PrismaService,
         private jwtService: JwtService
     ) { }
+
+    async checkAuth(user: user): Promise<WebResponse<any>> {
+        try {
+            return {
+                success: true,
+                message: authorized,
+                data: {
+                    name: user.name,
+                    email: user.email,
+                    accessToken: user.accessToken,
+                    refreshToken: user.refreshToken
+                }
+            }
+        } catch (error) {
+            return {
+                success: false,
+                message: unAuthorized
+            }
+        }
+    }
 
     async register(body: RegisterDTO): Promise<WebResponse<any>> {
         try {
@@ -90,13 +111,13 @@ export class AuthService {
                 }
             })
 
-            res.cookie('access-token', user.accessToken, {
+            res.cookie('access-token', user.refreshToken, {
                 httpOnly: true,
                 secure: true,
-                maxAge: 3600000,
+                maxAge: 3600000 * 24 * 7,
                 sameSite: 'strict',
             })
-            
+
             return {
                 success: true,
                 message: authLoginSuccess,
@@ -116,4 +137,32 @@ export class AuthService {
         }
 
     }
+
+    async try() {
+        try {
+            const result = await this.prismaService.$queryRaw<[]>`
+                SELECT 
+                    cu.id,
+                    cu.email,
+                    cu."fullName", 
+                    jsonb_build_object(
+                        'jalan', ca.jalan,
+                        'rt', ca.rt,
+                        'rw', ca.rw,
+                        'kelurahan', ca.kelurahan,
+                        'kecamatan', ca.kecamatan,
+                        'kota', ca.kota,
+                        'provinsi', ca.provinsi,
+                        'kodepos', ca.kodepos
+                    ) AS address 
+                FROM customer_user cu 
+                LEFT JOIN customer_address ca ON ca.id = cu."addressId"
+                GROUP BY cu.id, cu.email, cu."fullName", ca.jalan, ca.rt, ca.rw, ca.kelurahan, ca.kecamatan, ca.kota, ca.provinsi, ca.kodepos;
+            `
+            return result;
+        } catch (error) {
+
+        }
+    }
+
 }
