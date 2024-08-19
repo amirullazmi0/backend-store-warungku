@@ -41,6 +41,6 @@ import { AttachmentService } from 'src/attachment/attachment.service';
 })
 export class CummonModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
-        consumer.apply(AuthUserMidlleware).forRoutes('/api*');
+        consumer.apply(AuthUserMidlleware).forRoutes('/api*', '/auth');
     }
 }

@@ -63,7 +63,7 @@ export class ItemStoreService {
             const validate = ItemStoreCreateSchema.parse({
                 name: body.name,
                 price: Number(body.price),
-                total: Number(body.total),
+                qty: Number(body.qty),
                 desc: body.desc
             })
 
@@ -72,7 +72,7 @@ export class ItemStoreService {
                     id: id,
                     name: validate.name,
                     price: validate.price,
-                    total: validate.total,
+                    qty: validate.qty,
                     desc: validate.desc,
                     userId: user.id
                 }

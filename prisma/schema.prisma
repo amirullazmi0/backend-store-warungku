@@ -8,7 +8,7 @@ datasource db {
 }
 
 model user {
-  id           String        @id @default(uuid()) @db.Uuid
+  id           String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   email        String        @unique @db.VarChar(255)
   name         String        @db.VarChar(255)
   bio          String?
@@ -29,7 +29,7 @@ model user {
 }
 
 model address {
-  id          String        @id @default(uuid()) @db.Uuid
+  id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   active      Boolean?
   jalan       String?       @db.VarChar(255)
   rt          String?       @db.VarChar(255)
@@ -58,9 +58,9 @@ model userAddress {
 }
 
 model itemStore {
-  id                   String                 @id @default(uuid()) @db.Uuid
+  id                   String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name                 String                 @db.VarChar(255)
-  total                Int
+  qty                  Int
   price                Int
   desc                 String?
   createdAt            DateTime               @default(now())
@@ -75,7 +75,7 @@ model itemStore {
 }
 
 model category {
-  id                  String                @id @default(uuid()) @db.Uuid
+  id                  String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name                String                @db.VarChar(255)
   createdAt           DateTime              @default(now())
   updatedAt           DateTime              @updatedAt
@@ -95,7 +95,7 @@ model categoriesItemStore {
 }
 
 model itemStoreImages {
-  id          String    @id @default(uuid()) @db.Uuid
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   path        String    @db.VarChar(255)
   itemstoreId String    @db.Uuid
   itemStore   itemStore @relation(fields: [itemstoreId], references: [id], onDelete: Cascade)
@@ -104,7 +104,7 @@ model itemStoreImages {
 }
 
 model transaction {
-  id                   String                 @id @default(uuid()) @db.Uuid
+  id                   String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   customerId           String                 @db.Uuid
   invoice              Json?
   total                Int
@@ -121,8 +121,6 @@ model transactionItemStore {
   transactionId String      @db.Uuid
   itemStoreId   String      @db.Uuid
   qty           Int
-  unitPrice     Int
-  totalPrice    Int
   itemStore     itemStore   @relation(fields: [itemStoreId], references: [id])
   transaction   transaction @relation(fields: [transactionId], references: [id])
 

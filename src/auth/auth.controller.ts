@@ -10,6 +10,7 @@ export class AuthController {
     constructor(
         private authService: AuthService
     ) { }
+    
     @Post('check-auth')
     async checkAuth(
         @Auth() user: user
