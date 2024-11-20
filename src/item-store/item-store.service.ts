@@ -13,26 +13,13 @@ import ImageKit from "imagekit";
 
 @Injectable()
 export class ItemStoreService {
-    private publicKeyImageKit = process.env.PUBLIC_KEY_IMAGE_KIT
-    private privateKeyImageKit = process.env.PRIVATE_KEY_IMAGE_KIT
-    private urlImageKit = process.env.URL_IMAGE_KIT
-
-    private imageKit = new ImageKit({
-        publicKey: this.publicKeyImageKit,
-        privateKey: this.privateKeyImageKit,
-        urlEndpoint: this.urlImageKit,
-    })
-
     constructor(
         private prismaService: PrismaService,
         private attachmentService: AttachmentService,
-    ) {
-    }
+    ) { }
 
     async getItemStore(user: user, itemStoreId?: string): Promise<WebResponse<any>> {
         try {
-            this.imageKit
-
             let item: itemStore | itemStore[]
             if (itemStoreId) {
                 item = await this.prismaService.itemStore.findFirst({
@@ -96,7 +83,11 @@ export class ItemStoreService {
             if (images) {
                 for (let i = 0; i < images.length; i++) {
                     const imagesId = randomUUID()
-                    const save = await this.attachmentService.createFile(images[i], req)
+                    const save = await this.attachmentService.saveFileImageKit({
+                        file: images[i],
+                        folder: `/itemStore/${user.id}`
+                    })
+
                     item.push({
                         id: imagesId,
                         itemstoreId: saveItem.id,
@@ -106,24 +97,6 @@ export class ItemStoreService {
                 await this.prismaService.itemStoreImages.createMany({ data: item })
                 log(createFileSuccess)
             }
-
-            const uploadPromises = images.map((image) =>
-                this.imageKit.upload({
-                    file: image.buffer, // Pass the buffer here
-                    folder: '/shopowns',
-                    fileName: image.originalname,
-                    extensions: [
-                        {
-                            name: 'google-auto-tagging',
-                            maxTags: 5,
-                            minConfidence: 95,
-                        },
-                    ],
-                })
-            );
-
-            const uploadResponses = await Promise.all(uploadPromises);
-            console.log('imageKIte', uploadResponses);
 
             const itemStore = await this.prismaService.itemStore.findUnique({
                 where: { id: saveItem.id },

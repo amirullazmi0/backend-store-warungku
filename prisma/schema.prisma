@@ -19,6 +19,7 @@ model user {
   refreshToken String?       @db.VarChar(255)
   lastActive   DateTime?     @db.Timestamp(6)
   createdAt    DateTime      @default(now())
+  rolesName    rolesUser     @default(user)
   updatedAt    DateTime      @updatedAt
   itemstore    itemStore[]
   transaction  transaction[]
