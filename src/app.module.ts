@@ -9,7 +9,13 @@ import { AttachmentService } from './attachment/attachment.service';
 import { ItemStoreModule } from './item-store/item-store.module';
 
 @Module({
-  imports: [AuthModule, CummonModule, PrismaModule, UserModule, ItemStoreModule],
+  imports: [
+    AuthModule,
+    CummonModule,
+    PrismaModule,
+    UserModule,
+    ItemStoreModule,
+  ],
   controllers: [AppController],
   providers: [AppService, AttachmentService],
 })
