@@ -7,34 +7,28 @@ import { user } from '@prisma/client';
 
 @Controller('auth')
 export class AuthController {
-    constructor(
-        private authService: AuthService
-    ) { }
-    
-    @Post('check-auth')
-    async checkAuth(
-        @Auth() user: user
-    ) {
-        return await this.authService.checkAuth(user)
-    }
+  constructor(private authService: AuthService) {}
 
-    @Post('register')
-    async register(
-        @Body() body: RegisterDTO
-    ) {
-        return await this.authService.register(body)
-    }
+  @Post('check-auth')
+  async checkAuth(@Auth() user: user) {
+    return await this.authService.checkAuth(user);
+  }
 
-    @Post('login')
-    async login(
-        @Body() body: LoginDTO,
-        @Res({ passthrough: true }) res: Response
-    ) {
-        return await this.authService.login(body, res)
-    }
+  @Post('register')
+  async register(@Body() body: RegisterDTO) {
+    return await this.authService.register(body);
+  }
 
-    @Get('try')
-    async try() {
-        return this.authService.try()
-    }
+  @Post('login')
+  async login(
+    @Body() body: LoginDTO,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    return await this.authService.login(body, res);
+  }
+
+  @Get('try')
+  async try() {
+    return this.authService.try();
+  }
 }

@@ -13,7 +13,7 @@ async function bootstrap() {
   app.enableCors();
   // app.use(cookieParser());
   app.useStaticAssets(join(__dirname, '..', 'public'));
-  const env = app.get(ConfigService)
+  const env = app.get(ConfigService);
   await app.listen(env.get('PORT') || 3000);
 }
 bootstrap();
