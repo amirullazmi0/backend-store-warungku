@@ -3,13 +3,11 @@ import { itemStore, itemStoreImages, user } from '@prisma/client';
 import { log } from 'console';
 import { randomUUID } from 'crypto';
 import { Request } from 'express';
-import { NotFoundError } from 'rxjs';
 import { AttachmentService } from 'src/attachment/attachment.service';
 import { ItemStoreCreateRequestDTO, ItemStoreCreateSchema, ItemStoreDeleteRequestDTO } from 'src/dto/itemStore.dto';
 import { createDataFailed, createDataSuccess, createFileSuccess, dataNotFound, deleteDataFailed, deleteDataSuccess, getDataFailed, getDataSuccess } from 'src/dto/message';
 import { WebResponse } from 'src/dto/promise';
 import { PrismaService } from 'src/prisma/prisma.service';
-import ImageKit from "imagekit";
 
 @Injectable()
 export class ItemStoreService {
@@ -40,6 +38,9 @@ export class ItemStoreService {
                     where: { userId: user.id },
                     include: {
                         itemStoreImages: true
+                    },
+                    orderBy: {
+                        createdAt: 'desc'
                     }
                 })
             }
@@ -80,22 +81,26 @@ export class ItemStoreService {
             })
 
             let item: itemStoreImages[] = []
-            if (images) {
-                for (let i = 0; i < images.length; i++) {
-                    const imagesId = randomUUID()
-                    const save = await this.attachmentService.saveFileImageKit({
-                        file: images[i],
-                        folder: `/itemStore/${user.id}`
-                    })
+            if (images && images.length > 0) {
+                const itemImages = await Promise.all(
+                    images.map(async (img) => {
+                        const imagesId = randomUUID();
 
-                    item.push({
-                        id: imagesId,
-                        itemstoreId: saveItem.id,
-                        path: save.path
+                        const save = await this.attachmentService.saveFileImageKit({
+                            file: img,
+                            folder: `/itemStore/${user.id}`,
+                        });
+
+                        return {
+                            id: imagesId,
+                            itemstoreId: saveItem.id,
+                            path: save.path,
+                        };
                     })
-                }
-                await this.prismaService.itemStoreImages.createMany({ data: item })
-                log(createFileSuccess)
+                );
+
+                await this.prismaService.itemStoreImages.createMany({ data: itemImages });
+                log(createFileSuccess);
             }
 
             const itemStore = await this.prismaService.itemStore.findUnique({

@@ -4,7 +4,7 @@ export class ItemStoreCreateRequestDTO {
     name: string
     qty: number
     price: number
-    images: Express.Multer.File[]
+    // images: Express.Multer.File[]
     desc?: string
 }
 
