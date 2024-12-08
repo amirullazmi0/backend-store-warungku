@@ -10,8 +10,7 @@ import {
 } from '@prisma/client';
 import { log } from 'console';
 import { randomUUID } from 'crypto';
-import { Request } from 'express';
-import { NotFoundError } from 'rxjs';
+// import { Request } from 'express';
 import { AttachmentService } from 'src/attachment/attachment.service';
 import {
   ItemStoreCreateRequestDTO,
@@ -30,7 +29,7 @@ import {
 } from 'src/dto/message';
 import { WebResponse } from 'src/dto/promise';
 import { PrismaService } from 'src/prisma/prisma.service';
-import ImageKit from "imagekit";
+// import ImageKit from 'imagekit';
 
 @Injectable()
 export class ItemStoreService {
@@ -56,30 +55,33 @@ export class ItemStoreService {
           },
         });
 
-                if (!item) {
-                    throw new NotFoundException(dataNotFound)
-                }
-            } else {
-                item = await this.prismaService.itemStore.findMany({
-                    where: { userId: user.id },
-                    include: {
-                        itemStoreImages: true
-                    }
-                })
-            }
-            return {
-                success: true,
-                message: getDataSuccess,
-                data: item
-            }
-        } catch (error) {
-            return {
-                success: false,
-                message: getDataFailed,
-                error: error
-            }
+        if (!item) {
+          throw new NotFoundException(dataNotFound);
         }
+      } else {
+        item = await this.prismaService.itemStore.findMany({
+          where: { userId: user.id },
+          include: {
+            itemStoreImages: true,
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+        });
+      }
+      return {
+        success: true,
+        message: getDataSuccess,
+        data: item,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: getDataFailed,
+        error: error,
+      };
     }
+  }
 
   async createItemStore(
     user: user,
@@ -108,24 +110,30 @@ export class ItemStoreService {
         },
       });
 
-            let item: itemStoreImages[] = []
-            if (images) {
-                for (let i = 0; i < images.length; i++) {
-                    const imagesId = randomUUID()
-                    const save = await this.attachmentService.saveFileImageKit({
-                        file: images[i],
-                        folder: `/itemStore/${user.id}`
-                    })
+      //   const item: itemStoreImages[] = [];
+      if (images && images.length > 0) {
+        const itemImages = await Promise.all(
+          images.map(async (img) => {
+            const imagesId = randomUUID();
 
-                    item.push({
-                        id: imagesId,
-                        itemstoreId: saveItem.id,
-                        path: save.path
-                    })
-                }
-                await this.prismaService.itemStoreImages.createMany({ data: item })
-                log(createFileSuccess)
-            }
+            const save = await this.attachmentService.saveFileImageKit({
+              file: img,
+              folder: `/itemStore/${user.id}`,
+            });
+
+            return {
+              id: imagesId,
+              itemstoreId: saveItem.id,
+              path: save.path,
+            };
+          }),
+        );
+
+        await this.prismaService.itemStoreImages.createMany({
+          data: itemImages,
+        });
+        log(createFileSuccess);
+      }
 
       const itemStore = await this.prismaService.itemStore.findUnique({
         where: { id: saveItem.id },
