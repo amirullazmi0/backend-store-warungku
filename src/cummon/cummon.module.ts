@@ -14,33 +14,33 @@ import { AttachmentService } from 'src/attachment/attachment.service';
 
 @Global()
 @Module({
-    imports: [
-        WinstonModule.forRoot({
-            format: winston.format.json(),
-            transports: [new winston.transports.Console()],
-        }),
-        ConfigModule.forRoot({
-            isGlobal: true,
-        }),
-        ServeStaticModule.forRoot({
-            rootPath: join(__dirname, '../../../', 'public'),
-            exclude: ['/api/(.*)'],
-        }),
-        JwtModule.register({
-            global: true,
-            secret: 'mysecret-store-warungku-bosdannis',
-            //   signOptions: {
-            //     expiresIn: '1h',
-            //   },
-        }),
-        ScheduleModule.forRoot(),
-        HttpModule,
-    ],
-    providers: [PrismaService, TokenCleanupService, AttachmentService],
-    exports: [PrismaService, TokenCleanupService, AttachmentService],
+  imports: [
+    WinstonModule.forRoot({
+      format: winston.format.json(),
+      transports: [new winston.transports.Console()],
+    }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '../../../', 'public'),
+      exclude: ['/api/(.*)'],
+    }),
+    JwtModule.register({
+      global: true,
+      secret: 'mysecret-store-warungku-bosdannis',
+      //   signOptions: {
+      //     expiresIn: '1h',
+      //   },
+    }),
+    ScheduleModule.forRoot(),
+    HttpModule,
+  ],
+  providers: [PrismaService, TokenCleanupService, AttachmentService],
+  exports: [PrismaService, TokenCleanupService, AttachmentService],
 })
 export class CummonModule implements NestModule {
-    configure(consumer: MiddlewareConsumer) {
-        consumer.apply(AuthUserMidlleware).forRoutes('/api*', '/auth');
-    }
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(AuthUserMidlleware).forRoutes('/api*', '/auth');
+  }
 }
