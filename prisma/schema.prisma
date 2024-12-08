@@ -25,6 +25,8 @@ model user {
   transaction  transaction[]
   address      address?      @relation(fields: [addressId], references: [id])
   userAddress  userAddress[]
+  wishlist     wishlist[]
+  cart         cart[]
 
   @@map("store")
 }
@@ -71,6 +73,8 @@ model itemStore {
   user                 user                   @relation(fields: [userId], references: [id])
   itemStoreImages      itemStoreImages[]
   transactionItemStore transactionItemStore[]
+  wishlist             wishlist[]
+  cartItem             cartItem[]
 
   @@map("item_store")
 }
@@ -118,6 +122,20 @@ model transaction {
   @@map("transaction")
 }
 
+model wishlist {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String   @db.Uuid
+  itemStoreId String   @db.Uuid
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user      user      @relation(fields: [userId], references: [id])
+  itemStore itemStore @relation(fields: [itemStoreId], references: [id])
+
+  @@unique([userId, itemStoreId])
+  @@map("wishlist")
+}
+
 model transactionItemStore {
   transactionId String      @db.Uuid
   itemStoreId   String      @db.Uuid
@@ -127,6 +145,33 @@ model transactionItemStore {
 
   @@id([transactionId, itemStoreId])
   @@map("transaction_item_store")
+}
+
+model cart {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String   @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      user       @relation(fields: [userId], references: [id])
+  cartItems cartItem[]
+
+  @@map("cart")
+}
+
+model cartItem {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  cartId      String   @db.Uuid
+  itemStoreId String   @db.Uuid
+  qty         Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  cart      cart      @relation(fields: [cartId], references: [id])
+  itemStore itemStore @relation(fields: [itemStoreId], references: [id])
+
+  @@unique([cartId, itemStoreId])
+  @@map("cart_item")
 }
 
 enum rolesUser {
