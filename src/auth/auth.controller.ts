@@ -3,7 +3,7 @@ import { LoginDTO, RegisterDTO } from 'src/dto/auth.dto';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
 import { Auth } from 'src/cummon/auth.decorator';
-import { user } from '@prisma/client';
+// import { user } from '@prisma/client';
 
 @Controller('auth')
 export class AuthController {
