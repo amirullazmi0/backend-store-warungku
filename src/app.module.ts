@@ -9,6 +9,7 @@ import { AttachmentService } from './attachment/attachment.service';
 import { ItemStoreModule } from './item-store/item-store.module';
 import { WishlistModule } from './wishlist/wishlist.module';
 import { CartModule } from './cart/cart.module';
+import { AddressModule } from './address/address.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { CartModule } from './cart/cart.module';
     ItemStoreModule,
     WishlistModule,
     CartModule,
+    AddressModule,
   ],
   controllers: [AppController],
   providers: [AppService, AttachmentService],

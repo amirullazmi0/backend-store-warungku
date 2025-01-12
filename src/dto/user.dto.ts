@@ -20,6 +20,16 @@ export class UserUpdateLogoRequestDTO {
     logo: Express.Multer.File
 }
 
+export class userUpdateRequest {
+    email?: string;
+    fullName?: string;
+    addressId?: string;
+    // images?: string;
+    //   rolesName?: string;
+    //   accessToken?: string;
+    //   refreshToken: string;
+}
+
 export class AddressUpdateRequestDTO {
     jalan?: string
     rt?: string
@@ -52,3 +62,4 @@ export const AddressUpdateSchema = z.object({
     kota: z.string().optional(),
     provinsi: z.string().optional(),
 })
+

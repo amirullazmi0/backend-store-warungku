@@ -25,11 +25,14 @@ import { user } from '@prisma/client';
 
 @Controller('api/item-store')
 export class ItemStoreController {
-  constructor(private itemStoreService: ItemStoreService) {}
+  constructor(private itemStoreService: ItemStoreService) { }
 
   @Get()
-  async getItemStore(@Auth() user: user, @Query('id') itemStoreId?: string) {
-    return await this.itemStoreService.getItemStore(user, itemStoreId);
+  async getItemStore(
+    @Auth() user: user,
+    @Query('id') itemStoreId?: string,
+    @Query('name') itemStoreName?: string) {
+    return await this.itemStoreService.getItemStore(user, itemStoreId, itemStoreName);
   }
 
   @Post()

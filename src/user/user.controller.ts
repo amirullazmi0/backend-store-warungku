@@ -1,15 +1,18 @@
-import { Body, Controller, Get, HttpStatus, ParseFilePipeBuilder, Post, Req, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, ParseFilePipeBuilder, Post, Put, Req, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
-import { UserGetProfile, AddressUpdateRequestDTO, UserUpdateRequestDTO, PasswordUpdateRequestDTO, UserUpdateLogoRequestDTO } from 'src/dto/user.dto';
+import { UserGetProfile, AddressUpdateRequestDTO, UserUpdateRequestDTO, PasswordUpdateRequestDTO, UserUpdateLogoRequestDTO, userUpdateRequest } from 'src/dto/user.dto';
 import { Auth } from 'src/cummon/auth.decorator';
 import { user } from '@prisma/client';
 import { Request } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { AddressService } from 'src/address/address.service';
+import { addressUpdateRequest } from 'src/address/address.dto';
 
 @Controller('api/user')
 export class UserController {
     constructor(
-        private userService: UserService
+        private userService: UserService,
+        private addressService: AddressService
     ) { }
 
     @Get()
@@ -57,5 +60,31 @@ export class UserController {
         ) images?: Express.Multer.File
     ) {
         return await this.userService.updateImage(user, images, req)
+    }
+
+    @Get(`/profile`)
+    async getProfile(@Auth() user: user) {
+        return this.userService.getDataProfile(user);
+    }
+
+    @Get(`/profile/address`)
+    async getProfileAddress(@Auth() user: user) {
+        return this.addressService.getAddress(user);
+    }
+
+    @Put(`/update/profile`)
+    async updateUserProfile(
+        @Auth() user: user,
+        @Body() req: UserUpdateRequestDTO,
+    ) {
+        return this.userService.userUpdate(user, req);
+    }
+
+    @Put(`/update/profile/address`)
+    async updateProfileAddress(
+        @Auth() user: user,
+        @Body() req: addressUpdateRequest,
+    ) {
+        return this.addressService.updateAddressProfile(user, req);
     }
 }

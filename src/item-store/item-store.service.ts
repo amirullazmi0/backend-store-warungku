@@ -36,11 +36,12 @@ export class ItemStoreService {
   constructor(
     private prismaService: PrismaService,
     private attachmentService: AttachmentService,
-  ) {}
+  ) { }
 
   async getItemStore(
     user: user,
     itemStoreId?: string,
+    itemStoreName?: string,
   ): Promise<WebResponse<any>> {
     try {
       let item: itemStore | itemStore[];
