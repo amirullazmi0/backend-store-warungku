@@ -41,10 +41,12 @@ export class ItemStoreService {
   async getItemStore(
     user: user,
     itemStoreId?: string,
-    itemStoreName?: string,
+    keyword?: string,
+    category?: string[]
   ): Promise<WebResponse<any>> {
     try {
       let item: itemStore | itemStore[];
+
       if (itemStoreId) {
         item = await this.prismaService.itemStore.findFirst({
           where: {
@@ -53,6 +55,11 @@ export class ItemStoreService {
           },
           include: {
             itemStoreImages: true,
+            categoriesItemStore: {
+              include: {
+                category: true,
+              },
+            },
           },
         });
 
@@ -60,22 +67,66 @@ export class ItemStoreService {
           throw new NotFoundException(dataNotFound);
         }
       } else {
+        // ✅ Only apply category filter if valid
+        const categoryFilter =
+          category && category.length > 0 && category[0]
+            ? {
+              categoriesItemStore: {
+                some: {
+                  categoryId: { in: category.filter((id) => id !== '') },
+                },
+              },
+            }
+            : {};
+
         item = await this.prismaService.itemStore.findMany({
-          where: { userId: user.id },
+          where: {
+            userId: user.id,
+            ...categoryFilter,
+            OR: keyword
+              ? [
+                {
+                  name: {
+                    contains: keyword,
+                    mode: 'insensitive',
+                  },
+                },
+                {
+                  categoriesItemStore: {
+                    some: {
+                      category: {
+                        name: {
+                          contains: keyword,
+                          mode: 'insensitive',
+                        },
+                      },
+                    },
+                  },
+                },
+              ]
+              : undefined,
+          },
           include: {
             itemStoreImages: true,
+            categoriesItemStore: {
+              include: {
+                category: true,
+              },
+            },
           },
           orderBy: {
             createdAt: 'desc',
           },
         });
       }
+
       return {
         success: true,
         message: getDataSuccess,
         data: item,
       };
     } catch (error) {
+      console.error('Error fetching item store:', error); // ✅ Log error for debugging
       return {
         success: false,
         message: getDataFailed,
@@ -83,6 +134,7 @@ export class ItemStoreService {
       };
     }
   }
+
 
   async createItemStore(
     user: user,
@@ -130,10 +182,19 @@ export class ItemStoreService {
           }),
         );
 
+
         await this.prismaService.itemStoreImages.createMany({
           data: itemImages,
         });
         log(createFileSuccess);
+      }
+      if (body.category.length > 0) {
+        await this.prismaService.categoriesItemStore.createMany({
+          data: body.category.map((categoryId: string) => ({
+            itemStoreId: saveItem.id,
+            categoryId: categoryId,
+          })),
+        });
       }
 
       const itemStore = await this.prismaService.itemStore.findUnique({

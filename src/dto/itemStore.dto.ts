@@ -6,6 +6,7 @@ export class ItemStoreCreateRequestDTO {
     price: number
     // images: Express.Multer.File[]
     desc?: string
+    category: string[]
 }
 
 export class ItemStoreDeleteRequestDTO {

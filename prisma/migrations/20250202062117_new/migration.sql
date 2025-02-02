@@ -101,6 +101,17 @@ CREATE TABLE "transaction" (
 );
 
 -- CreateTable
+CREATE TABLE "wishlist" (
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "userId" UUID NOT NULL,
+    "itemStoreId" UUID NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "wishlist_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "transaction_item_store" (
     "transactionId" UUID NOT NULL,
     "itemStoreId" UUID NOT NULL,
@@ -109,8 +120,39 @@ CREATE TABLE "transaction_item_store" (
     CONSTRAINT "transaction_item_store_pkey" PRIMARY KEY ("transactionId","itemStoreId")
 );
 
+-- CreateTable
+CREATE TABLE "cart" (
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "userId" UUID NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "cart_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "cart_item" (
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "cartId" UUID NOT NULL,
+    "itemStoreId" UUID NOT NULL,
+    "qty" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "cart_item_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "store_email_key" ON "store"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "category_name_key" ON "category"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "wishlist_userId_itemStoreId_key" ON "wishlist"("userId", "itemStoreId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "cart_item_cartId_itemStoreId_key" ON "cart_item"("cartId", "itemStoreId");
 
 -- AddForeignKey
 ALTER TABLE "store" ADD CONSTRAINT "store_addressId_fkey" FOREIGN KEY ("addressId") REFERENCES "store_address"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -137,7 +179,22 @@ ALTER TABLE "item_store_images" ADD CONSTRAINT "item_store_images_itemstoreId_fk
 ALTER TABLE "transaction" ADD CONSTRAINT "transaction_userId_fkey" FOREIGN KEY ("userId") REFERENCES "store"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "wishlist" ADD CONSTRAINT "wishlist_userId_fkey" FOREIGN KEY ("userId") REFERENCES "store"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "wishlist" ADD CONSTRAINT "wishlist_itemStoreId_fkey" FOREIGN KEY ("itemStoreId") REFERENCES "item_store"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "transaction_item_store" ADD CONSTRAINT "transaction_item_store_itemStoreId_fkey" FOREIGN KEY ("itemStoreId") REFERENCES "item_store"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "transaction_item_store" ADD CONSTRAINT "transaction_item_store_transactionId_fkey" FOREIGN KEY ("transactionId") REFERENCES "transaction"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "cart" ADD CONSTRAINT "cart_userId_fkey" FOREIGN KEY ("userId") REFERENCES "store"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "cart_item" ADD CONSTRAINT "cart_item_cartId_fkey" FOREIGN KEY ("cartId") REFERENCES "cart"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "cart_item" ADD CONSTRAINT "cart_item_itemStoreId_fkey" FOREIGN KEY ("itemStoreId") REFERENCES "item_store"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

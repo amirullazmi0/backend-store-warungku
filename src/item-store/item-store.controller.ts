@@ -31,8 +31,11 @@ export class ItemStoreController {
   async getItemStore(
     @Auth() user: user,
     @Query('id') itemStoreId?: string,
-    @Query('name') itemStoreName?: string) {
-    return await this.itemStoreService.getItemStore(user, itemStoreId, itemStoreName);
+    @Query('keyword') keyword?: string,
+    @Query('category') category?: string | string[]
+  ) {
+    const categoryIds = Array.isArray(category) ? category : category?.split(',');
+    return await this.itemStoreService.getItemStore(user, itemStoreId, keyword, categoryIds);
   }
 
   @Post()
