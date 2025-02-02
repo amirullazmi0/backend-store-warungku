@@ -16,6 +16,9 @@ import {
   ItemStoreCreateRequestDTO,
   ItemStoreCreateSchema,
   ItemStoreDeleteRequestDTO,
+  ItemStoreImage,
+  ItemStoreUpdateRequestDTO,
+  ItemStoreUpdateSchema,
 } from 'src/dto/itemStore.dto';
 import {
   createDataFailed,
@@ -26,6 +29,8 @@ import {
   deleteDataSuccess,
   getDataFailed,
   getDataSuccess,
+  updateDataFailed,
+  updateDataSuccess,
 } from 'src/dto/message';
 import { WebResponse } from 'src/dto/promise';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -212,6 +217,134 @@ export class ItemStoreService {
       return {
         success: false,
         message: createDataFailed,
+        error: error,
+      };
+    }
+  }
+  async updateItemStore(
+    user: user,
+    body: ItemStoreUpdateRequestDTO,
+    images: Express.Multer.File[],
+    // req: Request,
+  ): Promise<WebResponse<any>> {
+    try {
+      const item = await this.prismaService.itemStore.findUnique({
+        where: {
+          id: body.id,
+          userId: user.id
+        }
+      })
+
+      if (!item) {
+        throw new NotFoundException(dataNotFound)
+      }
+
+      const imageBeforeArray = Array.isArray(body.imageBefore)
+        ? body.imageBefore
+        : [body.imageBefore]; // ✅ Convert string to array
+
+
+      const imageBefore = await this.prismaService.itemStoreImages.findMany({
+        where: {
+          id: {
+            in: imageBeforeArray
+          }
+        }
+      })
+
+
+      let allImages: ItemStoreImage[] = imageBefore ?? [];
+      const validate = ItemStoreUpdateSchema.parse({
+        id: user.id,
+        name: body.name,
+        price: Number(body.price),
+        qty: Number(body.qty),
+        desc: body.desc,
+      });
+
+      const saveItem = await this.prismaService.itemStore.update(
+        {
+          where: {
+            id: item.id
+          },
+          data: {
+            name: validate.name,
+            price: validate.price,
+            qty: validate.qty,
+            desc: validate.desc,
+            userId: user.id,
+          },
+        });
+
+      //   const item: itemStoreImages[] = [];
+      if (images && images.length > 0) {
+        const itemImages = await Promise.all(
+          images.map(async (img) => {
+            const imagesId = randomUUID();
+
+            const save = await this.attachmentService.saveFileImageKit({
+              file: img,
+              folder: `/itemStore/${user.id}`,
+            });
+
+            return {
+              id: imagesId,
+              itemstoreId: saveItem.id,
+              path: save.path,
+            };
+          }),
+
+        );
+
+        allImages = [...allImages, ...itemImages];
+      }
+
+      await this.prismaService.itemStoreImages.deleteMany({
+        where: {
+          itemstoreId: body.id,
+        },
+      });
+
+      await this.prismaService.itemStoreImages.createMany({
+        data: allImages.map((img) => ({
+          id: img.id,
+          itemstoreId: img.itemstoreId,
+          path: img.path,
+        })),
+      });
+
+      if (body.category.length > 0) {
+        // ✅ Step 1: Remove existing categories for this itemStore
+        await this.prismaService.categoriesItemStore.deleteMany({
+          where: {
+            itemStoreId: saveItem.id, // ✅ Remove existing category relations
+          },
+        });
+
+        // ✅ Step 2: Insert new categories
+        await this.prismaService.categoriesItemStore.createMany({
+          data: body.category.map((categoryId: string) => ({
+            itemStoreId: saveItem.id,
+            categoryId: categoryId,
+          })),
+        });
+      }
+
+      const itemStore = await this.prismaService.itemStore.findUnique({
+        where: { id: saveItem.id },
+        include: {
+          itemStoreImages: true,
+        },
+      });
+      return {
+        success: true,
+        message: updateDataSuccess,
+        data: itemStore,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: updateDataFailed,
         error: error,
       };
     }
