@@ -10,6 +10,7 @@ import { ItemStoreModule } from './item-store/item-store.module';
 import { WishlistModule } from './wishlist/wishlist.module';
 import { CartModule } from './cart/cart.module';
 import { AddressModule } from './address/address.module';
+import { CategoryModule } from './category/category.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { AddressModule } from './address/address.module';
     WishlistModule,
     CartModule,
     AddressModule,
+    CategoryModule,
   ],
   controllers: [AppController],
   providers: [AppService, AttachmentService],

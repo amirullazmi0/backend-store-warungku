@@ -6,6 +6,7 @@ import {
   HttpStatus,
   //   Param,
   ParseFilePipeBuilder,
+  Patch,
   Post,
   Query,
   Req,
@@ -18,6 +19,7 @@ import { Auth } from 'src/cummon/auth.decorator';
 import {
   ItemStoreCreateRequestDTO,
   ItemStoreDeleteRequestDTO,
+  ItemStoreUpdateRequestDTO,
 } from 'src/dto/itemStore.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
@@ -31,8 +33,11 @@ export class ItemStoreController {
   async getItemStore(
     @Auth() user: user,
     @Query('id') itemStoreId?: string,
-    @Query('name') itemStoreName?: string) {
-    return await this.itemStoreService.getItemStore(user, itemStoreId, itemStoreName);
+    @Query('keyword') keyword?: string,
+    @Query('category') category?: string | string[]
+  ) {
+    const categoryIds = Array.isArray(category) ? category : category?.split(',');
+    return await this.itemStoreService.getItemStore(user, itemStoreId, keyword, categoryIds);
   }
 
   @Post()
@@ -50,6 +55,27 @@ export class ItemStoreController {
     images?: Express.Multer.File[],
   ) {
     return await this.itemStoreService.createItemStore(
+      user,
+      body,
+      images,
+      // , req
+    );
+  }
+
+  @Patch()
+  @UseInterceptors(FilesInterceptor('images'))
+  async updateItemStore(
+    @Auth() user: user,
+    @Body() body: ItemStoreUpdateRequestDTO,
+    @UploadedFiles(
+      new ParseFilePipeBuilder().build({
+        errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+        fileIsRequired: false,
+      }),
+    )
+    images?: Express.Multer.File[],
+  ) {
+    return await this.itemStoreService.updateItemStore(
       user,
       body,
       images,
