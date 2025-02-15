@@ -105,14 +105,13 @@ export class TransactionsService {
       }>
     >(Prisma.sql`
       SELECT 
-        t.id AS transaction_id,
-        t."customerId",
-        t.invoice,
-        t.total,
-        t."userId" AS store_user_id,
-        t."createdAt",
-        t."updatedAt",
-        json_agg(
+      t.id AS transaction_id,
+      t."customerId",
+      jsonb_build_object(
+        'date', t.invoice::json->>'date',
+        'invoiceNumber', t.invoice::json->>'invoiceNumber',
+        'status', t.invoice::json->>'status',
+        'items', json_agg(
           json_build_object(
             'itemStoreId', tis."itemStoreId",
             'qty', tis.qty,
@@ -125,22 +124,26 @@ export class TransactionsService {
               WHERE isi."itemstoreId" = i.id
             )
           )
-        ) AS items,
-        cu."fullName" AS customer_fullName,
-        cu.email AS customer_email,
-        ca.jalan AS customer_address,
-        ca.kota AS customer_city
-      FROM transaction t
-      JOIN transaction_item_store tis ON t.id = tis."transactionId"
-      JOIN item_store i ON tis."itemStoreId" = i.id
-      JOIN customer_user cu ON t."customerId" = cu.id
-      LEFT JOIN customer_address ca ON cu."addressId" = ca.id
-      WHERE t.invoice::json->>'status' = ${status}
-        AND i."userId" = ${dbUser.id}::uuid
-      GROUP BY 
-        t.id, t."customerId", t.invoice, t.total, t."userId", t."createdAt", t."updatedAt",
-        cu."fullName", cu.email, ca.jalan, ca.kota
-    `);
+        )
+      ) AS invoice,
+      t.total,
+      t."userId" AS store_user_id,
+      t."createdAt",
+      t."updatedAt",
+      cu."fullName" AS customer_fullName,
+      cu.email AS customer_email,
+      ca.jalan AS customer_address,
+      ca.kota AS customer_city
+    FROM transaction t
+    JOIN transaction_item_store tis ON t.id = tis."transactionId"
+    JOIN item_store i ON tis."itemStoreId" = i.id
+    JOIN customer_user cu ON t."customerId" = cu.id
+    LEFT JOIN customer_address ca ON cu."addressId" = ca.id
+    WHERE t.invoice::json->>'status' = ${status}
+      AND i."userId" = ${dbUser.id}::uuid
+    GROUP BY 
+      t.id, t."customerId", t.invoice, t.total, t."userId", t."createdAt", t."updatedAt",
+      cu."fullName", cu.email, ca.jalan, ca.kota`);
 
     return transactions;
   }
