@@ -178,3 +178,9 @@ enum rolesUser {
   user
   super
 }
+
+enum statusPayment {
+  SETTLEMENT
+  PAID
+  UNPAID
+}
