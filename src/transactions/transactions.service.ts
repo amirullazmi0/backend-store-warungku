@@ -10,7 +10,7 @@ export class TransactionsService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly authService: AuthService,
-  ) {}
+  ) { }
 
   async create(createTransactionDto: CreateTransactionDto) {
     // Implement creation logic if needed.
