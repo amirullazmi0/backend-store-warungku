@@ -1,6 +1,9 @@
 -- CreateEnum
 CREATE TYPE "rolesUser" AS ENUM ('user', 'super');
 
+-- CreateEnum
+CREATE TYPE "statusPayment" AS ENUM ('SETTLEMENT', 'PAID', 'UNPAID');
+
 -- CreateTable
 CREATE TABLE "store" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),

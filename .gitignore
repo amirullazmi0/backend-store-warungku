@@ -60,3 +60,4 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 /public/cdn/images/*
 # !/public/cdn/document/.gitKeep
 # !/public/cdn/images
+.qodo
