@@ -65,6 +65,11 @@ export class ItemStoreService {
                 category: true,
               },
             },
+            transactionItemStore: {
+              include: {
+                transaction: true
+              }
+            }
           },
         });
 

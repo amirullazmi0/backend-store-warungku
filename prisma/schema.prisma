@@ -112,6 +112,7 @@ model transaction {
   id                   String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   customerId           String                 @db.Uuid
   invoice              Json?
+  invoiceUrl           String?
   total                Int
   userId               String                 @db.Uuid
   createdAt            DateTime               @default(now())
