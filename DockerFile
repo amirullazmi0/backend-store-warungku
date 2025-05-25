@@ -27,4 +27,4 @@ RUN yarn build
 EXPOSE 4001
 
 # Jalankan aplikasi
-CMD ["node", "dist/src/main"]
+CMD ["yarn", "start"]
