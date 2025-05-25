@@ -10,7 +10,12 @@ export class TransactionsService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly authService: AuthService,
-  ) {}
+  ) { }
+
+  async create(createTransactionDto: CreateTransactionDto) {
+    // Implement creation logic if needed.
+    return 'This action adds a new transaction';
+  }
 
   // This endpoint returns all transactions regardless of customer (if needed)
   async findAll() {
