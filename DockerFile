@@ -1,6 +1,9 @@
 # Gunakan image Node resmi (alpine = ringan)
 FROM node:20-alpine
 
+# Install dependencies dasar (termasuk openssl untuk Prisma)
+RUN apk add --no-cache bash openssl
+
 # Direktori kerja di dalam container
 WORKDIR /app
 
@@ -16,11 +19,15 @@ COPY . .
 # Salin file .env (pastikan file ini ada di root project)
 COPY .env .env
 
+# Generate Prisma Client 
+RUN npx prisma 
+RUN npx prisma generate
+
 # Build NestJS
 RUN yarn build
 
 # Buka port aplikasi
-EXPOSE 3000
+EXPOSE 4001
 
 # Jalankan aplikasi
 CMD ["node", "dist/src/main"]
