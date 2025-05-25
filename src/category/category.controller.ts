@@ -5,15 +5,10 @@ import { CategoryService } from './category.service';
 
 @Controller('api/category')
 export class CategoryController {
-    constructor(
-        private categoryService: CategoryService
-    ) { }
+  constructor(private categoryService: CategoryService) {}
 
-    @Get()
-    async GetCatecory(
-        @Auth() user: user,
-        @Body() categoryName: string[]
-    ) {
-        return await this.categoryService.getCategory()
-    }
+  @Get()
+  async GetCatecory(@Auth() user: user, @Body() categoryName: string[]) {
+    return await this.categoryService.getCategory();
+  }
 }

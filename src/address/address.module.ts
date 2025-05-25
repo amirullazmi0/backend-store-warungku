@@ -5,6 +5,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Module({
   controllers: [AddressController],
-  providers: [AddressService, PrismaService]
+  providers: [AddressService, PrismaService],
 })
-export class AddressModule { }
+export class AddressModule {}

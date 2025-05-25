@@ -6,6 +6,6 @@ import { AddressService } from 'src/address/address.service';
 
 @Module({
   providers: [UserService, AttachmentService, AddressService],
-  controllers: [UserController]
+  controllers: [UserController],
 })
-export class UserModule { }
+export class UserModule {}

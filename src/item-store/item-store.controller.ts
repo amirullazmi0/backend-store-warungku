@@ -27,17 +27,24 @@ import { user } from '@prisma/client';
 
 @Controller('api/item-store')
 export class ItemStoreController {
-  constructor(private itemStoreService: ItemStoreService) { }
+  constructor(private itemStoreService: ItemStoreService) {}
 
   @Get()
   async getItemStore(
     @Auth() user: user,
     @Query('id') itemStoreId?: string,
     @Query('keyword') keyword?: string,
-    @Query('category') category?: string | string[]
+    @Query('category') category?: string | string[],
   ) {
-    const categoryIds = Array.isArray(category) ? category : category?.split(',');
-    return await this.itemStoreService.getItemStore(user, itemStoreId, keyword, categoryIds);
+    const categoryIds = Array.isArray(category)
+      ? category
+      : category?.split(',');
+    return await this.itemStoreService.getItemStore(
+      user,
+      itemStoreId,
+      keyword,
+      categoryIds,
+    );
   }
 
   @Post()

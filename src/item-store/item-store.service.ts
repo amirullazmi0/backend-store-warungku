@@ -41,13 +41,13 @@ export class ItemStoreService {
   constructor(
     private prismaService: PrismaService,
     private attachmentService: AttachmentService,
-  ) { }
+  ) {}
 
   async getItemStore(
     user: user,
     itemStoreId?: string,
     keyword?: string,
-    category?: string[]
+    category?: string[],
   ): Promise<WebResponse<any>> {
     try {
       let item: itemStore | itemStore[];
@@ -76,12 +76,12 @@ export class ItemStoreService {
         const categoryFilter =
           category && category.length > 0 && category[0]
             ? {
-              categoriesItemStore: {
-                some: {
-                  categoryId: { in: category.filter((id) => id !== '') },
+                categoriesItemStore: {
+                  some: {
+                    categoryId: { in: category.filter((id) => id !== '') },
+                  },
                 },
-              },
-            }
+              }
             : {};
 
         item = await this.prismaService.itemStore.findMany({
@@ -90,25 +90,25 @@ export class ItemStoreService {
             ...categoryFilter,
             OR: keyword
               ? [
-                {
-                  name: {
-                    contains: keyword,
-                    mode: 'insensitive',
+                  {
+                    name: {
+                      contains: keyword,
+                      mode: 'insensitive',
+                    },
                   },
-                },
-                {
-                  categoriesItemStore: {
-                    some: {
-                      category: {
-                        name: {
-                          contains: keyword,
-                          mode: 'insensitive',
+                  {
+                    categoriesItemStore: {
+                      some: {
+                        category: {
+                          name: {
+                            contains: keyword,
+                            mode: 'insensitive',
+                          },
                         },
                       },
                     },
                   },
-                },
-              ]
+                ]
               : undefined,
           },
           include: {
@@ -139,7 +139,6 @@ export class ItemStoreService {
       };
     }
   }
-
 
   async createItemStore(
     user: user,
@@ -187,7 +186,6 @@ export class ItemStoreService {
           }),
         );
 
-
         await this.prismaService.itemStoreImages.createMany({
           data: itemImages,
         });
@@ -231,27 +229,25 @@ export class ItemStoreService {
       const item = await this.prismaService.itemStore.findUnique({
         where: {
           id: body.id,
-          userId: user.id
-        }
-      })
+          userId: user.id,
+        },
+      });
 
       if (!item) {
-        throw new NotFoundException(dataNotFound)
+        throw new NotFoundException(dataNotFound);
       }
 
       const imageBeforeArray = Array.isArray(body.imageBefore)
         ? body.imageBefore
         : [body.imageBefore]; // ✅ Convert string to array
 
-
       const imageBefore = await this.prismaService.itemStoreImages.findMany({
         where: {
           id: {
-            in: imageBeforeArray
-          }
-        }
-      })
-
+            in: imageBeforeArray,
+          },
+        },
+      });
 
       let allImages: ItemStoreImage[] = imageBefore ?? [];
       const validate = ItemStoreUpdateSchema.parse({
@@ -262,19 +258,18 @@ export class ItemStoreService {
         desc: body.desc,
       });
 
-      const saveItem = await this.prismaService.itemStore.update(
-        {
-          where: {
-            id: item.id
-          },
-          data: {
-            name: validate.name,
-            price: validate.price,
-            qty: validate.qty,
-            desc: validate.desc,
-            userId: user.id,
-          },
-        });
+      const saveItem = await this.prismaService.itemStore.update({
+        where: {
+          id: item.id,
+        },
+        data: {
+          name: validate.name,
+          price: validate.price,
+          qty: validate.qty,
+          desc: validate.desc,
+          userId: user.id,
+        },
+      });
 
       //   const item: itemStoreImages[] = [];
       if (images && images.length > 0) {
@@ -293,7 +288,6 @@ export class ItemStoreService {
               path: save.path,
             };
           }),
-
         );
 
         allImages = [...allImages, ...itemImages];

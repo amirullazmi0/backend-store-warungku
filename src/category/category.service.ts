@@ -6,16 +6,14 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class CategoryService {
-    constructor(
-        private prismaService: PrismaService
-    ) { }
+  constructor(private prismaService: PrismaService) {}
 
-    async getCategory(): Promise<WebResponse<category | category[]>> {
-        const data = await this.prismaService.category.findMany()
-        return {
-            success: true,
-            message: getDataSuccess,
-            data: data
-        }
-    }
+  async getCategory(): Promise<WebResponse<category | category[]>> {
+    const data = await this.prismaService.category.findMany();
+    return {
+      success: true,
+      message: getDataSuccess,
+      data: data,
+    };
+  }
 }
