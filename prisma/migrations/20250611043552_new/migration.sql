@@ -95,6 +95,7 @@ CREATE TABLE "transaction" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "customerId" UUID NOT NULL,
     "invoice" JSONB,
+    "invoiceUrl" TEXT,
     "total" INTEGER NOT NULL,
     "userId" UUID NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,

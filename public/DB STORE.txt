@@ -1,0 +1,42 @@
+DB STORE
+
+-- Enable the postgres_fdw extension
+CREATE EXTENSION postgres_fdw;
+
+-- Create the foreign server
+CREATE SERVER customer_server
+FOREIGN DATA WRAPPER postgres_fdw
+OPTIONS (host '103.150.101.172', dbname 'db_warungku', port '5433');
+
+-- Create user mapping for the foreign server
+CREATE USER MAPPING FOR user
+SERVER customer_server
+OPTIONS (user 'postgres', password 'loremipsum');
+
+-- Import foreign schema and specific tables from the remote server into the local schema
+
+IMPORT FOREIGN SCHEMA public
+LIMIT TO (customer_user)
+FROM SERVER customer_server
+INTO public;
+
+IMPORT FOREIGN SCHEMA public
+LIMIT TO (customer_address)
+FROM SERVER customer_server
+INTO public;
+
+IMPORT FOREIGN SCHEMA public
+LIMIT TO (wishlist_customer)
+FROM SERVER customer_server
+INTO public;
+
+IMPORT FOREIGN SCHEMA public
+LIMIT TO (user_customer_address)
+FROM SERVER customer_server
+INTO public;
+
+IMPORT FOREIGN SCHEMA public
+LIMIT TO (shopping_cart_customer)
+FROM SERVER customer_server
+INTO public;
+

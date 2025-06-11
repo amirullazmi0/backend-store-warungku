@@ -10,7 +10,13 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   // const loggerService = app.get(WINSTON_MODULE_NEST_PROVIDER)
   // app.useLogger(loggerService)
-  app.enableCors();
+  app.enableCors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true, // opsional, kalau perlu cookie auth
+  });
+
   // app.use(cookieParser());
   app.useStaticAssets(join(__dirname, '..', 'public'));
   const env = app.get(ConfigService);
