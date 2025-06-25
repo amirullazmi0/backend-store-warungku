@@ -47,7 +47,6 @@ jobs:
             Dockerfile
             captain-definition
             prisma/
-            # generated/
             tsconfig.json
             nest-cli.json
           outPath: deploy.tar
