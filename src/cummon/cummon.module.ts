@@ -22,10 +22,10 @@ import { AttachmentService } from 'src/attachment/attachment.service';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '../../../', 'public'),
-      exclude: ['/api/(.*)'],
-    }),
+    // ServeStaticModule.forRoot({
+    //   rootPath: join(__dirname, '../../../', 'public'),
+    //   exclude: ['/api/(.*)'],
+    // }),
     JwtModule.register({
       global: true,
       secret: 'mysecret-store-warungku-bosdannis',
