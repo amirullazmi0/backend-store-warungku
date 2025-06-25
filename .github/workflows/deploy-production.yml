@@ -41,12 +41,12 @@ jobs:
           command: c
           cwd: './'
           files: |
-            dist/
+            dist
             package.json
             package-lock.json
             Dockerfile
             captain-definition
-            prisma/
+            prisma
             tsconfig.json
             nest-cli.json
           outPath: deploy.tar
