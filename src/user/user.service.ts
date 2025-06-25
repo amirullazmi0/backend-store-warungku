@@ -116,40 +116,5 @@ export class UserService {
         }
     }
 
-    async updateImage(user: user, images: Express.Multer.File, req: Request): Promise<WebResponse<any>> {
-        try {
-            let dataImages: string = undefined
-
-            if (images) {
-                if (images.mimetype.startsWith('image/')) {
-                    const saveImages = await this.attachmentService.createFile(images, req)
-                    dataImages = saveImages.path.toString()
-                } else {
-                    throw new BadRequestException(fileMustImage)
-                }
-            }
-
-            const save = await this.prismaService.user.update({
-                where: { id: user.id },
-                data: {
-                    logo: dataImages
-                }
-            })
-
-            return {
-                success: true,
-                message: updateDataSuccess,
-                data: {
-                    path: save.logo
-                }
-            }
-        } catch (error) {
-            return {
-                success: false,
-                message: updateDataFailed,
-                error: error
-            }
-        }
-    }
 
 }

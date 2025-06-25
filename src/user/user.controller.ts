@@ -46,22 +46,6 @@ export class UserController {
         return await this.userService.updatePassword(user, body)
     }
 
-    @Post('logo')
-    @UseInterceptors(FileInterceptor('logo'))
-    async updateLogo(
-        @Auth() user: user,
-        @Req() req: Request,
-        @UploadedFile(
-            new ParseFilePipeBuilder()
-                .build({
-                    errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
-                    fileIsRequired: false
-                }),
-        ) images?: Express.Multer.File
-    ) {
-        return await this.userService.updateImage(user, images, req)
-    }
-
     @Get(`/profile`)
     async getProfile(@Auth() user: user) {
         return this.userService.getDataProfile(user);

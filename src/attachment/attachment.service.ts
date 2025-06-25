@@ -1,9 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { Request } from 'express';
-import { createFileFailed, createFileSuccess } from 'src/dto/message';
-import { pathDocument, pathImage } from 'src/dto/path';
-import * as mime from 'mime-types';
-import { log } from 'console';
 const fs = require('fs');
 import ImageKit from "imagekit";
 @Injectable()
@@ -17,45 +12,6 @@ export class AttachmentService {
         privateKey: this.privateKeyImageKit,
         urlEndpoint: this.urlImageKit,
     })
-
-    async createFile(file: Express.Multer.File, req: Request): Promise<{ path: string }> {
-        let data: string | string[]
-        const url = `${req.protocol}://${req.get('host')}`
-
-        const date = new Date
-        let path: string
-        if (file.mimetype.startsWith('image/')) {
-            const fileName = `IMG${date.getTime()}.${mime.extension(file.mimetype)}`;
-            const fileLocation = `${pathImage}/${fileName}`
-
-            try {
-                await fs.promises.writeFile(`./public/${fileLocation}`, file.buffer);
-                console.log(createFileSuccess);
-
-            } catch (error) {
-                console.log(createFileFailed);
-                return
-            }
-            path = `${url}/${fileLocation}`
-        } else {
-            const fileName = `DC${date.getTime()}.${mime.extension(file.mimetype)}`;
-            const fileLocation = `${pathDocument}/${fileName}`
-
-            try {
-                await fs.promises.writeFile(`./public/${fileLocation}`, file.buffer);
-                log(createFileSuccess)
-
-            } catch (error) {
-                log(createFileFailed);
-                return
-            }
-            path = `${url}/${fileLocation}`
-
-        }
-        return {
-            path: path
-        }
-    }
 
     async saveFileImageKit({
         file,
