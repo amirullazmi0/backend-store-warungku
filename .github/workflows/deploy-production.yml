@@ -43,7 +43,6 @@ jobs:
           files: |
             dist
             package.json
-            public
             package-lock.json
             Dockerfile
             captain-definition
