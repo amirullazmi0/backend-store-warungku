@@ -1,26 +1,11 @@
-# Gunakan image Node resmi (alpine = ringan)
-FROM node:20-alpine
+FROM node:22-alpine
+WORKDIR /usr/src/app
 
-# Direktori kerja di dalam container
-WORKDIR /app
+COPY package*.json ./
+RUN npm install --omit=dev
 
-# Salin file dependency
-COPY package.json yarn.lock ./
-
-# Install dependencies
-RUN yarn install
-
-# Salin semua source code
 COPY . .
 
-# Salin file .env (pastikan file ini ada di root project)
-COPY .env .env
+EXPOSE 8080
 
-# Build NestJS
-RUN yarn build
-
-# Buka port aplikasi
-EXPOSE 3000
-
-# Jalankan aplikasi
 CMD ["node", "dist/main"]
